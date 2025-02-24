@@ -1,0 +1,7 @@
+{
+    "schema": "/lib/drizzle.ts",
+    "out": "./drizzle",
+    "dialect": "postgresql"
+    
+  }
+  
