@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
@@ -10,30 +11,28 @@ interface Task {
 export default function TodoList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState<string>("");
-  const API_URL = "/api/game";
+  const API_URL = "/api/game"; // API ka URL
 
-  // ✅ Tasks fetch karna
+  // 📌 Tasks fetch karne ka function
   const fetchTasks = async () => {
     try {
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error("Failed to fetch tasks");
 
       const data = await res.json();
-      console.log("Fetched Data:", data);
-
       if (!Array.isArray(data)) throw new Error("Invalid data format");
 
-      setTasks(data.filter((task) => task.game !== null)); // ✅ Null values remove
+      setTasks(data.filter((task) => task.game !== null)); // Null values filter kar raha hai
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(); // Component mount hone par tasks fetch karein
   }, []);
 
-  // ✅ Task bina refresh ke add karna
+  // 📌 Task add karne ka function (Bina Refresh ke turant show karega)
   const addTask = async () => {
     if (!newTask.trim()) return;
 
@@ -46,21 +45,15 @@ export default function TodoList() {
 
       if (!res.ok) throw new Error("Failed to add task");
 
-      const newTaskData: Task = await res.json();
-
-      if (!newTaskData.id || !newTaskData.game) { 
-        console.error("Invalid task data:", newTaskData);
-        return;
-      }
-
-      setTasks((prevTasks) => [...prevTasks, newTaskData]); // ✅ UI turant update
-      setNewTask(""); // ✅ Input clear
+      const addedTask = await res.json(); // Server se response lein
+      setTasks((prevTasks) => [...prevTasks, addedTask]); // UI turant update karein
+      setNewTask(""); // Input field clear karein
     } catch (error) {
       console.error("Error adding task:", error);
     }
   };
 
-  // ✅ Task delete bina refresh ke
+  // 📌 Task delete karne ka function (Turant UI se hat jayega)
   const deleteTask = async (id: number) => {
     try {
       const res = await fetch(API_URL, {
@@ -71,7 +64,7 @@ export default function TodoList() {
 
       if (!res.ok) throw new Error("Failed to delete task");
 
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)); // ✅ UI turant update
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id)); // UI se turant remove karein
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -80,6 +73,7 @@ export default function TodoList() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#DD2476] p-4">
       <div className="bg-white/10 backdrop-blur-lg p-6 rounded-xl shadow-lg w-80">
+        {/* 📌 Task List */}
         <ul className="space-y-2">
           {tasks.length > 0 ? (
             tasks.map((task) => (
@@ -103,6 +97,8 @@ export default function TodoList() {
             <p className="text-white text-center">No tasks yet!</p>
           )}
         </ul>
+
+        {/* 📌 New Task Add Karne Ka Input */}
         <div className="mt-4 flex">
           <input
             type="text"
