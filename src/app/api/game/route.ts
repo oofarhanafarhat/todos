@@ -26,8 +26,17 @@ export async function POST(request: NextRequest) {
     if (!req.game) {
       throw new Error("Please enter a valid game name");
     }
-    await db.insert(todoTable).values({ game: req.game }).returning();
-    return NextResponse.json({ message: "Value added successfully" });
+
+  
+    const insertedTasks = await db.insert(todoTable).values({ game: req.game }).returning();
+    
+    
+    if (!insertedTasks || insertedTasks.length === 0) {
+      throw new Error("Failed to insert task");
+    }
+
+    
+    return NextResponse.json(insertedTasks[0]);  
   } catch (error) {
     return NextResponse.json(
       { message: (error as { message: string }).message },
@@ -35,6 +44,7 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 
 export async function DELETE(request: NextRequest) {
   try {
